@@ -1,0 +1,420 @@
+{
+  "name": "Email_Sender",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "5be9febd-a79d-4141-a63a-f94b62e911ba",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b96c8d60-9e21-4db1-95fe-f1d8ea56592f",
+      "name": "Webhook",
+      "webhookId": "5be9febd-a79d-4141-a63a-f94b62e911ba"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "event_type",
+                    "rightValue": "user_registration",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4f822519-760e-442e-b082-10e8fb50f249"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d01724f6-22a8-49eb-913b-62709c45dd59",
+                    "leftValue": "event_type",
+                    "rightValue": "donation_completed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4af0f321-8041-480b-9da3-b0451ff58ed5",
+                    "leftValue": "event_type",
+                    "rightValue": "monthly_report",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0522b6de-baaa-4d6f-accd-95a8b775f78f",
+                    "leftValue": "event_type",
+                    "rightValue": "send_otp",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9c12a79d-b2f4-42bf-a86b-bbc1b84963b5",
+                    "leftValue": "event_type",
+                    "rightValue": "campaign_milestone",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        176,
+        -48
+      ],
+      "id": "02547a00-f1f3-4d6e-9327-c6030c07c25e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}\n\nusing the above information ceate a styled html format for a email. Make it so that there is only the html code as you will be directly sending it to them.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "b818ecf6-f017-4175-9480-28ec92343b53",
+      "name": "Donation Completed"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}\n\nusing the above information ceate a styled html format for a email. Make it so that there is only the html code as you will be directly sending it to them.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -352
+      ],
+      "id": "be27a739-7f14-4475-b6b6-8027868028ac",
+      "name": "User Registration"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}\n\nusing the above information ceate a styled html format for a email. Make it so that there is only the html code as you will be directly sending it to them.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        352
+      ],
+      "id": "f283eac5-3d1c-4719-8886-6559ea6c9122",
+      "name": "Campaign Milestone"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}\n\nusing the above information ceate a styled html format for a email. Make it so that there is only the html code as you will be directly sending it to them.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        176
+      ],
+      "id": "35f13988-22ae-4375-8dff-cc8b55fce990",
+      "name": "Send Otp"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}\n\nusing the above information ceate a styled html format for a email. Make it so that there is only the html code as you will be directly sending it to them.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a5cf870d-77f0-4a96-a730-2b69c147f783",
+      "name": "Monthly Report"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        304
+      ],
+      "id": "07ea98cc-6397-41ec-977e-f2c9ee0504e8",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "uW3VnhxuwW6NPNRN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json['email'] }}",
+        "subject": "={{ $('Webhook').item.json['event_type'] }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        0
+      ],
+      "id": "d1919e1e-3187-4d16-8c84-1ef2a56c09c2",
+      "name": "Send a message",
+      "webhookId": "1b6a1d8f-d2ca-4c20-b425-4b3daae9301d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9YjlWMSQM2Qefjp3",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "User Registration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Donation Completed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Monthly Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Otp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Campaign Milestone",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Campaign Milestone",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Send Otp",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Monthly Report",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Donation Completed",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "User Registration",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign Milestone": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Otp": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Report": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Donation Completed": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Registration": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a2af811e-d358-4987-ba58-c35b364e4d7b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2efc3a960aca61e5082256decd0c098068f9dd84e19de2b0ffe0db598db010bf"
+  },
+  "id": "p6MhGWfBP8LMgUmv",
+  "tags": []
+}
