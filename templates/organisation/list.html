@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Organizations - Donation Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold">Verified Organizations</h1>
+            <p class="lead">Trusted organizations making a real difference in communities worldwide</p>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <div class="input-group">
+                <input type="text" class="form-control search-input" placeholder="Search organizations..." id="org-search">
+                <button class="btn btn-outline-primary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Organizations Grid -->
+    <div class="row" id="organizations-container">
+        {% for org in organisations %}
+        <div class="col-lg-4 col-md-6 mb-4 searchable-item">
+            <div class="card org-card h-100">
+                {% if org.banner_image %}
+                <img src="{{ org.banner_image }}" class="card-img-top" alt="{{ org.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top org-banner-placeholder">
+                    <svg width="100%" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="400" height="200" fill="#e9ecef"/>
+                        <circle cx="200" cy="100" r="40" fill="#6c757d"/>
+                        <text x="200" y="150" text-anchor="middle" fill="#6c757d" font-size="14">{{ org.name[:3].upper() }}</text>
+                    </svg>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if org.logo_image %}
+                        <img src="{{ org.logo_image }}" class="org-logo me-3" alt="{{ org.name }}">
+                        {% else %}
+                        <div class="org-logo-placeholder me-3">
+                            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="50" height="50" fill="#dee2e6" rx="25"/>
+                                <text x="25" y="30" text-anchor="middle" fill="#6c757d" font-size="12">{{ org.name[0] }}</text>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="card-title mb-1">{{ org.name }}</h5>
+                            <span class="badge bg-success">Verified</span>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text flex-grow-1">{{ org.description[:120] }}{% if org.description|length > 120 %}...{% endif %}</p>
+                    
+                    <div class="org-stats mb-3">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Total Raised</small>
+                                <strong>${{ "%.0f"|format(org.total_donations) }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Campaigns</small>
+                                <strong>{{ org.get_campaigns()|length }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <a href="{{ url_for('org.detail', id=org._id) }}" class="btn btn-primary w-100">Learn More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Load More Button -->
+    {% if has_next %}
+    <div class="text-center mt-4">
+        <button class="btn btn-outline-primary load-more-btn" 
+                data-container="#organizations-container" 
+                data-url="{{ url_for('org.list') }}" 
+                data-page="{{ page }}">
+            Load More Organizations
+        </button>
+    </div>
+    {% endif %}
+    
+    <!-- Empty State -->
+    {% if not organisations %}
+    <div class="text-center py-5">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="30" fill="#e9ecef"/>
+            <text x="50" y="55" text-anchor="middle" fill="#6c757d" font-size="12">No Orgs</text>
+        </svg>
+        <h4 class="mt-3">No Organizations Found</h4>
+        <p class="text-muted">Check back later for new verified organizations.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.org-logo, .org-logo-placeholder {
+    width: 50px;
+    height: 50px;
+}
+
+.org-logo {
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.org-banner-placeholder {
+    height: 200px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.org-stats {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+[data-theme="dark"] .org-stats {
+    background-color: #2c2c2c;
+}
+</style>
+{% endblock %}

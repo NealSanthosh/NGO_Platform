@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}My Campaigns - Organization Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('org_dashboard.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">My Campaigns</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-5 fw-bold">My Campaigns</h1>
+                    <p class="lead text-muted">Manage your fundraising campaigns</p>
+                </div>
+                {% if organisation.is_verified %}
+                <a href="{{ url_for('campaign.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>New Campaign
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% if campaigns %}
+    <div class="row">
+        {% for campaign in campaigns %}
+        <div class="col-lg-6 mb-4">
+            <div class="card campaign-card h-100">
+                {% if campaign.banner_image %}
+                <img src="{{ campaign.banner_image }}" class="card-img-top" alt="{{ campaign.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-{{ 'success' if campaign.is_active else 'secondary' }}">
+                            {{ 'Active' if campaign.is_active else 'Inactive' }}
+                        </span>
+                        <span class="badge bg-primary">{{ campaign.category }}</span>
+                    </div>
+                    
+                    <h5 class="card-title">{{ campaign.title }}</h5>
+                    <p class="card-text">{{ campaign.description[:100] }}...</p>
+                    
+                    <div class="progress mb-3">
+                        <div class="progress-bar" style="width: '{{ campaign.progress_percentage }}%'"></div>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <strong class="text-success">${{ "%.0f"|format(campaign.raised_amount) }}</strong>
+                            <br><small class="text-muted">Raised</small>
+                        </div>
+                        <div class="col-4">
+                            <strong>${{ "%.0f"|format(campaign.goal_amount) }}</strong>
+                            <br><small class="text-muted">Goal</small>
+                        </div>
+                        <div class="col-4">
+                            <strong>{{ "%.0f"|format(campaign.progress_percentage) }}%</strong>
+                            <br><small class="text-muted">Complete</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <a href="{{ url_for('campaign.detail', id=campaign._id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="editCampaign('{{ campaign._id }}')">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="campaignStats('{{ campaign._id }}')">
+                            <i class="fas fa-chart-bar me-1"></i>Stats
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-bullhorn fa-4x text-muted mb-3"></i>
+        <h4>No campaigns yet</h4>
+        {% if organisation.is_verified %}
+        <p class="text-muted">Create your first campaign to start fundraising!</p>
+        <a href="{{ url_for('campaign.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Create Your First Campaign
+        </a>
+        {% else %}
+        <p class="text-muted">Create campaigns once your organization is verified.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function editCampaign(campaignId) {
+    // Implementation for editing campaign
+    DonationPlatform.showNotification('Edit campaign functionality would open edit form', 'info');
+}
+
+function campaignStats(campaignId) {
+    // Implementation for campaign statistics
+    DonationPlatform.showNotification('Campaign statistics would open in modal', 'info');
+}
+</script>
+{% endblock %}

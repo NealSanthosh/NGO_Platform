@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}My Donations - Donation Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user_dashboard.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">My Donations</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold">My Donations</h1>
+            <p class="lead text-muted">View all your donations and their impact</p>
+        </div>
+    </div>
+    
+    <!-- Donations Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Donation History</h5>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-outline-primary btn-sm" onclick="exportDonations()">
+                        <i class="fas fa-download me-1"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if donation_details %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Campaign/Organization</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Receipt</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detail in donation_details %}
+                        {% set donation = detail.donation %}
+                        {% set campaign = detail.campaign %}
+                        {% set organisation = detail.organisation %}
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>{{ donation.created_at.strftime('%b %d, %Y') }}</strong>
+                                    <br><small class="text-muted">{{ donation.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if campaign %}
+                                    <div class="campaign-thumb me-2">
+                                        {% if campaign.banner_image %}
+                                        <img src="{{ campaign.banner_image }}" width="40" height="30" style="object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                        <div style="width: 40px; height: 30px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image text-muted" style="font-size: 12px;"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ campaign.title[:30] }}...</strong>
+                                        <br><small class="text-muted">by {{ organisation.name }}</small>
+                                    </div>
+                                    {% else %}
+                                    <div class="org-thumb me-2">
+                                        {% if organisation.logo_image %}
+                                        <img src="{{ organisation.logo_image }}" width="30" height="30" style="object-fit: cover; border-radius: 50%;">
+                                        {% else %}
+                                        <div style="width: 30px; height: 30px; background: #dee2e6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <span style="font-size: 10px; color: #6c757d;">{{ organisation.name[0] }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ organisation.name }}</strong>
+                                        <br><small class="text-muted">Direct donation</small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <strong class="text-success">${{ "%.2f"|format(donation.amount) }}</strong>
+                                {% if donation.is_anonymous %}
+                                <br><small class="text-muted">Anonymous</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if donation.payment_status == 'completed' else 'warning' }}">
+                                    {{ donation.payment_status.title() }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="font-monospace">{{ donation.receipt_id }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('donation.receipt', donation_id=donation._id) }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-receipt"></i>
+                                    </a>
+                                    {% if campaign %}
+                                    <a href="{{ url_for('campaign.detail', id=campaign._id) }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if has_next %}
+            <div class="text-center mt-3">
+                <a href="{{ url_for('user_dashboard.donations', page=page+1) }}" class="btn btn-outline-primary">
+                    Load More Donations
+                </a>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+                <h5>No donations yet</h5>
+                <p class="text-muted">Start making a difference by supporting campaigns!</p>
+                <a href="{{ url_for('campaign.list') }}" class="btn btn-primary">Browse Campaigns</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function exportDonations() {
+    // Simple CSV export functionality
+    const donations = [];
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        donations.push({
+            date: cells[0].textContent.trim(),
+            campaign: cells[1].textContent.trim(),
+            amount: cells[2].textContent.trim(),
+            status: cells[3].textContent.trim(),
+            receipt: cells[4].textContent.trim()
+        });
+    });
+    
+    let csv = 'Date,Campaign/Organization,Amount,Status,Receipt ID\n';
+    donations.forEach(donation => {
+        csv += `"${donation.date}","${donation.campaign}","${donation.amount}","${donation.status}","${donation.receipt}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my_donations.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

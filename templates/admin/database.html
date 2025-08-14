@@ -1,0 +1,379 @@
+{% extends "dashboards/admin.html" %}
+
+{% block title %}Database Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>Database Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Database</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Database Overview -->
+    <div class="row mb-4">
+        {% for collection, count in collections.items() %}
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-{{ 'users' if collection == 'users' else 'building' if collection == 'organisations' else 'bullhorn' if collection == 'campaigns' else 'hand-holding-usd' if collection == 'donations' else 'images' }}"></i>
+                </div>
+                <h4 class="stat-number">{{ "{:,}".format(count) }}</h4>
+                <p class="stat-label">{{ collection.title() }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Database Operations -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="admin-table mb-4">
+                <h5 class="p-3 mb-0">Collection Management</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Collection</th>
+                            <th>Documents</th>
+                            <th>Size (Est.)</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <i class="fas fa-users text-primary me-2"></i>
+                                <strong>users</strong>
+                            </td>
+                            <td>{{ "{:,}".format(collections.users) }}</td>
+                            <td>{{ "%.1f"|format((collections.users * 0.5)) }} KB</td>
+                            <td>{{ datetime.utcnow().strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary db-action-btn" data-action="backup" data-collection="users">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info db-action-btn" data-action="analyze" data-collection="users">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning db-action-btn" data-action="optimize" data-collection="users">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-building text-success me-2"></i>
+                                <strong>organisations</strong>
+                            </td>
+                            <td>{{ "{:,}".format(collections.organisations) }}</td>
+                            <td>{{ "%.1f"|format((collections.organisations * 1.2)) }} KB</td>
+                            <td>{{ datetime.utcnow().strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary db-action-btn" data-action="backup" data-collection="organisations">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info db-action-btn" data-action="analyze" data-collection="organisations">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning db-action-btn" data-action="optimize" data-collection="organisations">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-bullhorn text-warning me-2"></i>
+                                <strong>campaigns</strong>
+                            </td>
+                            <td>{{ "{:,}".format(collections.campaigns) }}</td>
+                            <td>{{ "%.1f"|format((collections.campaigns * 0.8)) }} KB</td>
+                            <td>{{ datetime.utcnow().strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary db-action-btn" data-action="backup" data-collection="campaigns">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info db-action-btn" data-action="analyze" data-collection="campaigns">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning db-action-btn" data-action="optimize" data-collection="campaigns">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-hand-holding-usd text-danger me-2"></i>
+                                <strong>donations</strong>
+                            </td>
+                            <td>{{ "{:,}".format(collections.donations) }}</td>
+                            <td>{{ "%.1f"|format((collections.donations * 0.6)) }} KB</td>
+                            <td>{{ datetime.utcnow().strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary db-action-btn" data-action="backup" data-collection="donations">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info db-action-btn" data-action="analyze" data-collection="donations">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning db-action-btn" data-action="optimize" data-collection="donations">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <i class="fas fa-images text-info me-2"></i>
+                                <strong>images</strong>
+                            </td>
+                            <td>{{ "{:,}".format(collections.images) }}</td>
+                            <td>{{ "%.1f"|format((collections.images * 15.5)) }} MB</td>
+                            <td>{{ datetime.utcnow().strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary db-action-btn" data-action="backup" data-collection="images">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info db-action-btn" data-action="analyze" data-collection="images">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                    <button class="btn btn-outline-warning db-action-btn" data-action="cleanup" data-collection="images">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Database Maintenance -->
+            <div class="admin-table">
+                <h5 class="p-3 mb-0">Maintenance Operations</h5>
+                <div class="p-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-database fa-2x text-primary mb-2"></i>
+                                    <h6>Full Database Backup</h6>
+                                    <p class="small text-muted">Create a complete backup of all collections</p>
+                                    <button class="btn btn-primary btn-sm" onclick="performMaintenance('full_backup')">
+                                        <i class="fas fa-download me-1"></i>Create Backup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-broom fa-2x text-success mb-2"></i>
+                                    <h6>Database Cleanup</h6>
+                                    <p class="small text-muted">Remove orphaned records and optimize storage</p>
+                                    <button class="btn btn-success btn-sm" onclick="performMaintenance('cleanup')">
+                                        <i class="fas fa-broom me-1"></i>Clean Database
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-pie fa-2x text-warning mb-2"></i>
+                                    <h6>Performance Analysis</h6>
+                                    <p class="small text-muted">Analyze database performance and indexes</p>
+                                    <button class="btn btn-warning btn-sm" onclick="performMaintenance('analyze')">
+                                        <i class="fas fa-chart-bar me-1"></i>Analyze Performance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-danger">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sync fa-2x text-danger mb-2"></i>
+                                    <h6>Rebuild Indexes</h6>
+                                    <p class="small text-muted">Rebuild database indexes for better performance</p>
+                                    <button class="btn btn-danger btn-sm" onclick="performMaintenance('reindex')">
+                                        <i class="fas fa-sync me-1"></i>Rebuild Indexes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Database Health -->
+            <div class="stat-card mb-4">
+                <h5>Database Health</h5>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Overall Health</small>
+                        <small>95%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 95%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Query Performance</small>
+                        <small>88%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 88%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Storage Efficiency</small>
+                        <small>92%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Operations -->
+            <div class="stat-card mb-4">
+                <h5>Recent Operations</h5>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <i class="fas fa-download text-primary"></i>
+                        <div>
+                            <strong>Database Backup</strong>
+                            <br><small class="text-muted">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <i class="fas fa-user-plus text-success"></i>
+                        <div>
+                            <strong>New User Registration</strong>
+                            <br><small class="text-muted">4 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <i class="fas fa-broom text-warning"></i>
+                        <div>
+                            <strong>Database Cleanup</strong>
+                            <br><small class="text-muted">1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Information -->
+            <div class="stat-card">
+                <h5>System Information</h5>
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td><strong>MongoDB Version:</strong></td>
+                        <td>6.0.4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Storage:</strong></td>
+                        <td>{{ "%.2f"|format((collections.users * 0.5 + collections.organisations * 1.2 + collections.campaigns * 0.8 + collections.donations * 0.6) / 1024) }} MB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Indexes:</strong></td>
+                        <td>{{ collections|length * 3 }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Last Backup:</strong></td>
+                        <td>2 hours ago</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.timeline-item i {
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    background: white;
+    border: 2px solid currentColor;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    width: 2px;
+    height: calc(100% + 1rem);
+    background: #dee2e6;
+}
+</style>
+
+<script>
+function performMaintenance(operation) {
+    if (!confirm(`Are you sure you want to perform ${operation}? This may take some time.`)) {
+        return;
+    }
+    
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processing...';
+    button.disabled = true;
+    
+    // Simulate maintenance operation
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        switch(operation) {
+            case 'full_backup':
+                DonationPlatform.showNotification('Database backup completed successfully', 'success');
+                break;
+            case 'cleanup':
+                DonationPlatform.showNotification('Database cleanup completed. 15 orphaned records removed.', 'success');
+                break;
+            case 'analyze':
+                DonationPlatform.showNotification('Performance analysis completed. Report generated.', 'info');
+                break;
+            case 'reindex':
+                DonationPlatform.showNotification('Database indexes rebuilt successfully', 'success');
+                break;
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

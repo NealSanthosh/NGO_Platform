@@ -1,0 +1,223 @@
+{% extends "dashboards/admin.html" %}
+
+{% block title %}Organizations Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>Organizations Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Organizations</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-section mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control admin-search" placeholder="Search organizations...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="verification-filter">
+                    <option value="all" {{ 'selected' if current_status == 'all' }}>All Organizations</option>
+                    <option value="verified" {{ 'selected' if current_status == 'verified' }}>Verified</option>
+                    <option value="pending" {{ 'selected' if current_status == 'pending' }}>Pending Verification</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="sort-filter">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="donations">Most Donations</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="applyOrgFilters()">Filter</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Organizations Table -->
+    <div class="admin-table">
+        <div class="d-flex justify-content-between align-items-center p-3">
+            <h5 class="mb-0">Organizations ({{ organisations|length }})</h5>
+            <div class="export-controls">
+                <button class="btn btn-outline-primary btn-sm export-btn" data-format="csv" data-type="organizations">
+                    <i class="fas fa-download me-1"></i>Export CSV
+                </button>
+                <button class="btn btn-outline-success btn-sm export-btn" data-format="pdf" data-type="organizations">
+                    <i class="fas fa-file-pdf me-1"></i>Export PDF
+                </button>
+            </div>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" class="form-check-input select-all">
+                    </th>
+                    <th>Organization</th>
+                    <th>Registration</th>
+                    <th>Total Raised</th>
+                    <th>Campaigns</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for org in organisations %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input item-checkbox" value="{{ org._id }}">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="org-avatar me-3">
+                                {% if org.logo_image %}
+                                <img src="{{ org.logo_image }}" width="40" height="40" style="border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                <div style="width: 40px; height: 40px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
+                                    {{ org.name[0].upper() }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong>{{ org.name }}</strong>
+                                <br><small class="text-muted">{{ org.registration_number or 'No reg number' }}</small>
+                                {% if org.website %}
+                                <br><small><a href="{{ org.website }}" target="_blank" class="text-primary">{{ org.website[:30] }}...</a></small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ org.created_at.strftime('%b %d, %Y') }}</strong>
+                        <br><small class="text-muted">{{ (datetime.utcnow() - org.created_at).days }} days ago</small>
+                    </td>
+                    <td>
+                        <strong class="text-success">${{ "%.0f"|format(org.total_donations) }}</strong>
+                        <br><small class="text-muted">Total donations</small>
+                    </td>
+                    <td>
+                        <strong>{{ org.get_campaigns()|length }}</strong>
+                        <br><small class="text-muted">Active campaigns</small>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ 'verified' if org.is_verified else 'pending' }}">
+                            {{ 'Verified' if org.is_verified else 'Pending' }}
+                        </span>
+                        {% if not org.is_verified %}
+                        <br><small class="text-warning">Awaiting review</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('org.detail', id=org._id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if not org.is_verified %}
+                            <button class="btn btn-sm btn-success verify-org-btn" 
+                                    data-org-id="{{ org._id }}" 
+                                    data-action="approve"
+                                    data-org-name="{{ org.name }}">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger verify-org-btn" 
+                                    data-org-id="{{ org._id }}" 
+                                    data-action="reject"
+                                    data-org-name="{{ org.name }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-outline-info" onclick="viewOrgDetails('{{ org._id }}')">
+                                <i class="fas fa-info"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if has_next %}
+        <div class="p-3 text-center">
+            <a href="{{ url_for('admin.organisations', page=page+1, status=current_status) }}" class="btn btn-outline-primary">
+                Load More Organizations
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Bulk Actions -->
+    <div class="bulk-actions d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <span><span class="selected-count">0</span> organizations selected</span>
+            <div>
+                <button class="btn btn-outline-success btn-sm" onclick="bulkVerify('approve')">
+                    Bulk Approve
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="bulkVerify('reject')">
+                    Bulk Reject
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function applyOrgFilters() {
+    const searchTerm = document.querySelector('.admin-search').value.toLowerCase();
+    const verification = document.getElementById('verification-filter').value;
+    
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const statusCell = row.cells[5].textContent.toLowerCase();
+        
+        const matchesSearch = text.includes(searchTerm);
+        let matchesVerification = true;
+        
+        if (verification === 'verified') {
+            matchesVerification = statusCell.includes('verified');
+        } else if (verification === 'pending') {
+            matchesVerification = statusCell.includes('pending');
+        }
+        
+        row.style.display = matchesSearch && matchesVerification ? 'table-row' : 'none';
+    });
+}
+
+function viewOrgDetails(orgId) {
+    // Implementation for viewing organization details in modal
+    DonationPlatform.showNotification('Organization details would open in modal', 'info');
+}
+
+function bulkVerify(action) {
+    const selectedOrgs = document.querySelectorAll('.item-checkbox:checked');
+    if (selectedOrgs.length === 0) {
+        DonationPlatform.showNotification('Please select organizations first', 'warning');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to ${action} ${selectedOrgs.length} organizations?`)) {
+        // Implementation for bulk verification
+        setTimeout(() => {
+            DonationPlatform.showNotification(`${selectedOrgs.length} organizations ${action}d successfully`, 'success');
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Auto-apply search filter
+document.querySelector('.admin-search').addEventListener('input', applyOrgFilters);
+document.getElementById('verification-filter').addEventListener('change', function() {
+    window.location.href = `{{ url_for('admin.organisations') }}?status=${this.value}`;
+});
+</script>
+{% endblock %}

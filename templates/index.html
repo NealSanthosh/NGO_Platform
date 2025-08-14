@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">Make a Difference Today</h1>
+                <p class="lead">Connect with verified organizations and campaigns making real impact in communities worldwide.</p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">Start Donating</a>
+                    <a href="{{ url_for('org.list') }}" class="btn btn-outline-primary btn-lg">Explore Organizations</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <svg width="500" height="400" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="500" height="400" fill="#f8f9fa"/>
+                        <circle cx="250" cy="200" r="80" fill="#007bff" opacity="0.1"/>
+                        <circle cx="250" cy="200" r="60" fill="#007bff" opacity="0.2"/>
+                        <circle cx="250" cy="200" r="40" fill="#007bff" opacity="0.3"/>
+                        <path d="M220 180 L240 200 L280 160" stroke="#007bff" stroke-width="4" fill="none"/>
+                        <text x="250" y="280" text-anchor="middle" fill="#6c757d" font-size="16">Verified Donations</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-building fa-3x text-primary mb-3"></i>
+                    <h3 class="display-6 fw-bold">{{ org_count }}</h3>
+                    <p class="text-muted">Verified Organizations</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                    <h3 class="display-6 fw-bold">{{ campaign_count }}</h3>
+                    <p class="text-muted">Active Campaigns</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
+                    <h3 class="display-6 fw-bold">${{ "%.2f"|format(total_raised) }}</h3>
+                    <p class="text-muted">Total Raised</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <h2 class="display-5 fw-bold mb-4">About Our Platform</h2>
+                <p class="lead">We connect donors with verified organizations and campaigns, ensuring transparency and impact in every donation.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Verified Organizations</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Transparent Reporting</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Secure Donations</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Impact Tracking</li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <svg width="100%" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="400" height="300" fill="#ffffff" rx="10"/>
+                    <rect x="50" y="50" width="300" height="200" fill="#f8f9fa" rx="5"/>
+                    <circle cx="100" cy="100" r="20" fill="#007bff"/>
+                    <rect x="140" y="85" width="120" height="10" fill="#dee2e6" rx="5"/>
+                    <rect x="140" y="105" width="80" height="10" fill="#dee2e6" rx="5"/>
+                    <rect x="50" y="150" width="300" height="80" fill="#e9ecef" rx="5"/>
+                    <text x="200" y="195" text-anchor="middle" fill="#6c757d" font-size="14">Donation Impact</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Campaigns -->
+<section class="campaigns-section py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold">Featured Campaigns</h2>
+                <p class="lead">Support these impactful campaigns making a difference</p>
+            </div>
+        </div>
+        <div class="row">
+            {% for campaign in featured_campaigns %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card campaign-card h-100">
+                    {% if campaign.banner_image %}
+                    <img src="{{ campaign.banner_image }}" class="card-img-top" alt="{{ campaign.title }}">
+                    {% else %}
+                    <div class="card-img-top campaign-placeholder">
+                        <svg width="100%" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="300" height="200" fill="#e9ecef"/>
+                            <circle cx="150" cy="100" r="30" fill="#6c757d"/>
+                            <text x="150" y="150" text-anchor="middle" fill="#6c757d" font-size="12">Campaign Image</text>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ campaign.title }}</h5>
+                        <p class="card-text">{{ campaign.description[:100] }}...</p>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" style="width: '{{ campaign.progress_percentage }}%'"></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted">${{ "%.2f"|format(campaign.raised_amount) }} raised</small>
+                            <small class="text-muted">Goal: ${{ "%.2f"|format(campaign.goal_amount) }}</small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('campaign.detail', id=campaign._id) }}" class="btn btn-primary">View Campaign</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('campaign.list') }}" class="btn btn-outline-primary">View All Campaigns</a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Organizations -->
+<section class="organizations-section py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="display-5 fw-bold">Trusted Organizations</h2>
+                <p class="lead">Verified organizations you can trust</p>
+            </div>
+        </div>
+        <div class="row">
+            {% for org in featured_orgs %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card org-card h-100">
+                    <div class="card-body text-center">
+                        {% if org.logo_image %}
+                        <img src="{{ org.logo_image }}" class="org-logo mb-3" alt="{{ org.name }}">
+                        {% else %}
+                        <div class="org-logo-placeholder mb-3">
+                            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="80" height="80" fill="#e9ecef" rx="40"/>
+                                <text x="40" y="45" text-anchor="middle" fill="#6c757d" font-size="12">ORG</text>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <h5 class="card-title">{{ org.name }}</h5>
+                        <p class="card-text">{{ org.description[:80] }}...</p>
+                        <div class="org-stats">
+                            <small class="text-muted">Total Raised: ${{ "%.2f"|format(org.total_donations) }}</small>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('org.detail', id=org._id) }}" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('org.list') }}" class="btn btn-outline-primary">View All Organizations</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

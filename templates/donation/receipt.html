@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Donation Receipt - Donation Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card receipt-card">
+                <div class="card-header bg-success text-white text-center">
+                    <i class="fas fa-check-circle fa-3x mb-3"></i>
+                    <h2 class="mb-0">Thank You for Your Donation!</h2>
+                    <p class="mb-0">Your generosity makes a real difference</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Receipt Header -->
+                    <div class="receipt-header text-center mb-4">
+                        <h4>Official Donation Receipt</h4>
+                        <p class="text-muted">Receipt ID: <strong>{{ donation.receipt_id }}</strong></p>
+                        <p class="text-muted">Date: {{ donation.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                    </div>
+                    
+                    <!-- Donation Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Donation Details</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Amount:</strong></td>
+                                    <td class="text-success fw-bold fs-5">${{ "%.2f"|format(donation.amount) }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Transaction ID:</strong></td>
+                                    <td>{{ donation.transaction_id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Status:</strong></td>
+                                    <td><span class="badge bg-success">{{ donation.payment_status.title() }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Anonymous:</strong></td>
+                                    <td>{{ 'Yes' if donation.is_anonymous else 'No' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Campaign & Organization</h6>
+                            <div class="campaign-info">
+                                {% if campaign %}
+                                <div class="d-flex align-items-start mb-3">
+                                    {% if campaign.banner_image %}
+                                    <img src="{{ campaign.banner_image }}" class="campaign-thumb me-3" alt="{{ campaign.title }}">
+                                    {% else %}
+                                    <div class="campaign-thumb-placeholder me-3">
+                                        <svg width="60" height="40" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="60" height="40" fill="#e9ecef" rx="4"/>
+                                            <text x="30" y="25" text-anchor="middle" fill="#6c757d" font-size="8">IMG</text>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-1">{{ campaign.title }}</h6>
+                                        <small class="text-muted">Campaign</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="d-flex align-items-center">
+                                    {% if organisation.logo_image %}
+                                    <img src="{{ organisation.logo_image }}" class="org-thumb me-3" alt="{{ organisation.name }}">
+                                    {% else %}
+                                    <div class="org-thumb-placeholder me-3">
+                                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="40" height="40" fill="#dee2e6" rx="20"/>
+                                            <text x="20" y="25" text-anchor="middle" fill="#6c757d" font-size="10">{{ organisation.name[0] }}</text>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-1">{{ organisation.name }}</h6>
+                                        <small class="text-muted">Organization</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Message -->
+                    {% if donation.message %}
+                    <div class="donation-message mb-4">
+                        <h6>Your Message</h6>
+                        <div class="alert alert-light">
+                            <i class="fas fa-quote-left text-muted me-2"></i>
+                            {{ donation.message }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Tax Information -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tax Information:</strong> This receipt serves as proof of your charitable donation. Please consult with your tax advisor regarding the deductibility of this contribution.
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="receipt-actions text-center">
+                        <button class="btn btn-primary me-2" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i>Print Receipt
+                        </button>
+                        <button class="btn btn-outline-primary me-2 copy-btn" data-target="#receipt-id">
+                            <i class="fas fa-copy me-1"></i>Copy Receipt ID
+                        </button>
+                        <a href="{{ url_for('user_dashboard.donations') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-1"></i>View All Donations
+                        </a>
+                    </div>
+                    
+                    <!-- Hidden receipt ID for copying -->
+                    <div id="receipt-id" style="display: none;">{{ donation.receipt_id }}</div>
+                </div>
+                
+                <div class="card-footer text-center bg-light">
+                    <h6 class="mb-2">What's Next?</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-envelope text-primary mb-2"></i>
+                            <p class="small">You'll receive email updates about the campaign's progress</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-chart-line text-success mb-2"></i>
+                            <p class="small">Track the impact of your donation in your dashboard</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-share text-info mb-2"></i>
+                            <p class="small">Share this campaign with friends and family</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Campaigns -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Other Ways to Help</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-share-alt fa-2x text-primary me-3"></i>
+                                <div>
+                                    <h6>Share This Campaign</h6>
+                                    <p class="small text-muted mb-0">Help us reach more supporters by sharing on social media</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-heart fa-2x text-danger me-3"></i>
+                                <div>
+                                    <h6>Explore More Campaigns</h6>
+                                    <p class="small text-muted mb-0">Discover other impactful campaigns you can support</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('campaign.list') }}" class="btn btn-primary me-2">Browse Campaigns</a>
+                        <button class="btn btn-outline-primary" onclick="shareCampaign()">Share Campaign</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.receipt-card {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.campaign-thumb, .org-thumb {
+    border-radius: 4px;
+}
+
+.campaign-thumb {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.org-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.campaign-thumb-placeholder, .org-thumb-placeholder {
+    flex-shrink: 0;
+}
+
+@media print {
+    .receipt-actions, .card-footer {
+        display: none !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+</style>
+
+{% if campaign %}
+<script>
+function shareCampaign() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ campaign.title }}',
+            text: 'I just supported this amazing campaign. Join me in making a difference!',
+            url: '{{ url_for("campaign.detail", id=campaign._id, _external=True) }}'
+        });
+    } else {
+        const url = '{{ url_for("campaign.detail", id=campaign._id, _external=True) }}';
+        navigator.clipboard.writeText(url);
+        DonationPlatform.showNotification('Campaign link copied to clipboard!', 'success');
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

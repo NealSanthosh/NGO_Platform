@@ -1,0 +1,58 @@
+<footer class="footer bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>Donation Platform</h5>
+                <p>Connecting donors with verified organizations to make a meaningful impact in communities worldwide.</p>
+                <div class="social-links">
+                    <a href="#" class="me-3"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="me-3"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6>Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('main.about') }}">About</a></li>
+                    <li><a href="{{ url_for('org.list') }}">Organizations</a></li>
+                    <li><a href="{{ url_for('campaign.list') }}">Campaigns</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h6>Support</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h6>Newsletter</h6>
+                <p>Stay updated with our latest campaigns and impact stories.</p>
+                <form class="newsletter-form">
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Enter your email">
+                        <button class="btn btn-primary" type="submit">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2024 Donation Platform. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <small>Made with <i class="fas fa-heart text-danger"></i> for a better world</small>
+            </div>
+        </div>
+    </div>
+</footer>

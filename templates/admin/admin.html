@@ -1,0 +1,213 @@
+{% extends "dashboards/admin.html" %}
+
+{% block title %}Users Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>Users Management</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Users</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-section mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control admin-search" placeholder="Search users...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="user-type-filter">
+                    <option value="">All User Types</option>
+                    <option value="donor">Donors</option>
+                    <option value="organisation">Organizations</option>
+                    <option value="admin">Administrators</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="applyUserFilters()">Filter</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="admin-table">
+        <div class="d-flex justify-content-between align-items-center p-3">
+            <h5 class="mb-0">All Users ({{ users|length }})</h5>
+            <div class="export-controls">
+                <button class="btn btn-outline-primary btn-sm export-btn" data-format="csv" data-type="users">
+                    <i class="fas fa-download me-1"></i>Export CSV
+                </button>
+            </div>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" class="form-check-input select-all">
+                    </th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input item-checkbox" value="{{ user._id }}">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar me-2">
+                                {% if user.profile_image %}
+                                <img src="{{ user.profile_image }}" width="32" height="32" style="border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                <div style="width: 32px; height: 32px; background: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+                                    {{ user.username[0].upper() }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong>{{ user.username }}</strong>
+                                {% if user.phone %}
+                                <br><small class="text-muted">{{ user.phone }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'primary' if user.user_type == 'donor' else 'success' if user.user_type == 'organisation' else 'danger' }}">
+                            {{ user.user_type.title() }}
+                        </span>
+                    </td>
+                    <td>{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                    <td> 
+                        <span class="status-badge {{ 'verified' if user.is_active else 'pending' }}">
+                            {{ 'Active' if user.is_active else 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewUser('{{ user._id }}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editUser('{{ user._id }}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            {% if user.user_type != 'admin' %}
+                            <button class="btn btn-sm btn-outline-danger" onclick="toggleUserStatus('{{ user._id }}', '{{ user.is_active|lower }}')">
+                                <i class="fas fa-{{ 'ban' if user.is_active else 'check' }}"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if has_next %}
+        <div class="p-3 text-center">
+            <a href="{{ url_for('admin.users', page=page+1) }}" class="btn btn-outline-primary">
+                Load More Users
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Bulk Actions -->
+    <div class="bulk-actions d-none">
+        <div class="d-flex justify-content-between align-items-center">
+            <span><span class="selected-count">0</span> users selected</span>
+            <div>
+                <button class="btn btn-outline-warning btn-sm" onclick="bulkAction('deactivate')">
+                    Deactivate Selected
+                </button>
+                <button class="btn btn-outline-success btn-sm" onclick="bulkAction('activate')">
+                    Activate Selected
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function applyUserFilters() {
+    const searchTerm = document.querySelector('.admin-search').value.toLowerCase();
+    const userType = document.getElementById('user-type-filter').value;
+    const status = document.getElementById('status-filter').value;
+    
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const typeCell = row.cells[3].textContent.toLowerCase();
+        const statusCell = row.cells[5].textContent.toLowerCase();
+        
+        const matchesSearch = text.includes(searchTerm);
+        const matchesType = !userType || typeCell.includes(userType);
+        const matchesStatus = !status || statusCell.includes(status);
+        
+        row.style.display = matchesSearch && matchesType && matchesStatus ? 'table-row' : 'none';
+    });
+}
+
+function viewUser(userId) {
+    // Implementation for viewing user details
+    DonationPlatform.showNotification('View user functionality would open user details', 'info');
+}
+
+function editUser(userId) {
+    // Implementation for editing user
+    DonationPlatform.showNotification('Edit user functionality would open edit form', 'info');
+}
+
+function toggleUserStatus(userId, currentStatus) {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+        // Implementation for toggling user status
+        setTimeout(() => {
+            DonationPlatform.showNotification(`User ${action}d successfully`, 'success');
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+function bulkAction(action) {
+    const selectedUsers = document.querySelectorAll('.item-checkbox:checked');
+    if (selectedUsers.length === 0) {
+        DonationPlatform.showNotification('Please select users first', 'warning');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to ${action} ${selectedUsers.length} users?`)) {
+        // Implementation for bulk actions
+        setTimeout(() => {
+            DonationPlatform.showNotification(`${selectedUsers.length} users ${action}d successfully`, 'success');
+            window.location.reload();
+        }, 1000);
+    }
+}
+
+// Auto-apply search filter
+document.querySelector('.admin-search').addEventListener('input', applyUserFilters);
+document.getElementById('user-type-filter').addEventListener('change', applyUserFilters);
+document.getElementById('status-filter').addEventListener('change', applyUserFilters);
+</script>
+{% endblock %}

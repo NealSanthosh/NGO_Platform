@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Create Campaign - Donation Platform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Create New Campaign</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Campaign Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" required placeholder="Enter a compelling campaign title">
+                            <div class="invalid-feedback">Please provide a campaign title.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Campaign Description *</label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required placeholder="Tell supporters about your campaign, what you're raising money for, and the impact their donations will make..."></textarea>
+                            <div class="invalid-feedback">Please provide a campaign description.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="goal_amount" class="form-label">Fundraising Goal *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="goal_amount" name="goal_amount" required min="100" step="0.01" placeholder="5000">
+                                    </div>
+                                    <div class="invalid-feedback">Please provide a valid goal amount (minimum $100).</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Category *</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Choose category...</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Health">Health & Medical</option>
+                                        <option value="Environment">Environment</option>
+                                        <option value="Poverty">Poverty & Hunger</option>
+                                        <option value="Disaster">Disaster Relief</option>
+                                        <option value="Animals">Animal Welfare</option>
+                                        <option value="Arts">Arts & Culture</option>
+                                        <option value="Sports">Sports & Recreation</option>
+                                        <option value="Community">Community Development</option>
+                                        <option value="General">General</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a category.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="end_date" class="form-label">End Date (Optional)</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" min="{{ (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d') }}">
+                                    <div class="form-text">Leave blank for ongoing campaigns</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="banner_image" class="form-label">Campaign Image</label>
+                                    <input type="file" class="form-control" id="banner_image" name="banner_image" accept="image/*">
+                                    <div class="form-text">Wide image recommended (max 5MB)</div>
+                                    <div id="banner_image-preview" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campaign Guidelines -->
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-lightbulb me-2"></i>Campaign Guidelines</h6>
+                            <ul class="mb-0 small">
+                                <li>Be specific about how donations will be used</li>
+                                <li>Set a realistic and achievable goal</li>
+                                <li>Include compelling images that show your cause</li>
+                                <li>Provide regular updates to your supporters</li>
+                                <li>All campaigns are subject to review and approval</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Organization Info -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">Campaign Organization</h6>
+                                <div class="d-flex align-items-center">
+                                    {% if organisation.logo_image %}
+                                    <img src="{{ organisation.logo_image }}" class="me-3" alt="{{ organisation.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                    {% else %}
+                                    <div class="me-3">
+                                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="50" height="50" fill="#dee2e6" rx="25"/>
+                                            <text x="25" y="30" text-anchor="middle" fill="#6c757d" font-size="12">{{ organisation.name[0] }}</text>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-1">{{ organisation.name }}</h6>
+                                        <small class="text-muted">This campaign will be created under your organization</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I confirm that this campaign is legitimate and all funds raised will be used for the stated purpose. I agree to provide updates and maintain transparency with donors.
+                            </label>
+                            <div class="invalid-feedback">You must agree to the terms.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('org_dashboard.campaigns') }}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i>Create Campaign
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Real-time goal amount formatting
+document.getElementById('goal_amount').addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    if (!isNaN(value)) {
+        const formatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0
+        }).format(value);
+        
+        // Show formatted value in a small helper text
+        let helper = document.querySelector('.goal-helper');
+        if (!helper) {
+            helper = document.createElement('small');
+            helper.className = 'form-text goal-helper';
+            this.parentNode.appendChild(helper);
+        }
+        helper.textContent = `Goal: ${formatted}`;
+    }
+});
+</script>
+{% endblock %}

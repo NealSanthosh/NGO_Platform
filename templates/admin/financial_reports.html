@@ -1,0 +1,328 @@
+{% extends "dashboards/admin.html" %}
+
+{% block title %}Financial Reports - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div class="admin-header">
+        <h1>Financial Reports</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Financial Reports</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <!-- Report Controls -->
+    <div class="filter-section mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label">Report Period</label>
+                <select class="form-select" id="period-select">
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="start-date">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="end-date">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-primary w-100" onclick="generateReport()">
+                    <i class="fas fa-chart-bar me-1"></i>Generate Report
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3 class="stat-number">${{ "{:,.0f}".format(monthly_data|sum(attribute='total') if monthly_data else 0) }}</h3>
+                <p class="stat-label">Total Revenue</p>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +15.3% from last period
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card primary">
+                <div class="stat-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="stat-number">{{ "{:,}".format(monthly_data|sum(attribute='count') if monthly_data else 0) }}</h3>
+                <p class="stat-label">Total Donations</p>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +8.7% from last period
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3 class="stat-number">
+                    ${{ "{:.0f}".format((monthly_data|sum(attribute='total') / monthly_data|sum(attribute='count')) if monthly_data and monthly_data|sum(attribute='count') > 0 else 0) }}
+                </h3>
+                <p class="stat-label">Average Donation</p>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> +5.2% from last period
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card danger">
+                <div class="stat-icon">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <h3 class="stat-number">2.1%</h3>
+                <p class="stat-label">Platform Fee</p>
+                <div class="stat-change neutral">
+                    <i class="fas fa-minus"></i> No change
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Monthly Donations Chart -->
+        <div class="col-lg-8">
+            <div class="chart-container mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Monthly Donation Trends</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary active" onclick="toggleChart('donations')">Donations</button>
+                        <button class="btn btn-outline-primary" onclick="toggleChart('revenue')">Revenue</button>
+                        <button class="btn btn-outline-primary" onclick="toggleChart('both')">Both</button>
+                    </div>
+                </div>
+                <canvas id="monthlyTrendsChart" height="300"></canvas>
+            </div>
+            
+            <!-- Top Performing Campaigns -->
+            <div class="admin-table">
+                <h5 class="p-3 mb-0">Top Performing Campaigns</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Organization</th>
+                            <th>Raised</th>
+                            <th>Goal</th>
+                            <th>Progress</th>
+                            <th>Donors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in top_campaigns[:10] %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="campaign-thumb me-2">
+                                        {% if campaign.banner_image %}
+                                        <img src="{{ campaign.banner_image }}" width="40" height="30" style="object-fit: cover; border-radius: 4px;">
+                                        {% else %}
+                                        <div style="width: 40px; height: 30px; background: #e9ecef; border-radius: 4px;"></div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{{ campaign.title[:30] }}...</strong>
+                                        <br><small class="text-muted">{{ campaign.category }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% set org = campaign.get_organisation() %}
+                                {{ org.name if org else 'Unknown' }}
+                            </td>
+                            <td>
+                                <strong class="text-success">${{ "{:,.0f}".format(campaign.raised_amount) }}</strong>
+                            </td>
+                            <td>
+                                <span class="text-muted">${{ "{:,.0f}".format(campaign.goal_amount) }}</span>
+                            </td>
+                            <td>
+                                <div class="progress" style="width: 80px; height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: '{{ campaign.progress_percentage }}%'"></div>
+                                </div>
+                                <small class="text-muted">{{ "%.0f"|format(campaign.progress_percentage) }}%</small>
+                            </td>
+                            <td>
+                                <strong>{{ (campaign.raised_amount / 50)|int }}</strong>
+                                <small class="text-muted">donors</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Top Organizations -->
+            <div class="admin-table mb-4">
+                <h5 class="p-3 mb-0">Top Organizations by Revenue</h5>
+                <div class="p-3">
+                    {% for org in top_orgs[:5] %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="org-avatar me-2">
+                                {% if org.logo_image %}
+                                <img src="{{ org.logo_image }}" width="32" height="32" style="border-radius: 50%; object-fit: cover;">
+                                {% else %}
+                                <div style="width: 32px; height: 32px; background: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+                                    {{ org.name[0] }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <strong class="small">{{ org.name[:20] }}...</strong>
+                                <br><small class="text-muted">{{ org.get_campaigns()|length }} campaigns</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <strong class="text-success">${{ "{:,.0f}".format(org.total_donations) }}</strong>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Export Options -->
+            <div class="stat-card">
+                <h5>Export Reports</h5>
+                <p class="text-muted small">Download detailed financial reports in various formats.</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary btn-sm export-btn" data-format="pdf" data-type="financial">
+                        <i class="fas fa-file-pdf me-1"></i>PDF Report
+                    </button>
+                    <button class="btn btn-outline-success btn-sm export-btn" data-format="xlsx" data-type="financial">
+                        <i class="fas fa-file-excel me-1"></i>Excel Report
+                    </button>
+                    <button class="btn btn-outline-info btn-sm export-btn" data-format="csv" data-type="financial">
+                        <i class="fas fa-file-csv me-1"></i>CSV Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize the monthly trends chart
+let trendsChart;
+
+function initializeTrendsChart() {
+    const ctx = document.getElementById('monthlyTrendsChart').getContext('2d');
+    
+    // Sample data - replace with actual backend data
+    const monthlyData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+            label: 'Donations ($)',
+            data: [12000, 19000, 8000, 25000, 22000, 30000, 28000, 35000, 42000, 38000, 45000, 50000],
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            borderColor: 'rgba(40, 167, 69, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3
+        }]
+    };
+    
+    trendsChart = new Chart(ctx, {
+        type: 'line',
+        data: monthlyData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+}
+
+function toggleChart(type) {
+    // Update chart based on selection
+    document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update chart data based on type
+    // Implementation depends on backend data structure
+    DonationPlatform.showNotification(`Switched to ${type} view`, 'info');
+}
+
+function generateReport() {
+    const period = document.getElementById('period-select').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    
+    // Show loading state
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Generating...';
+    button.disabled = true;
+    
+    // Simulate report generation
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+        DonationPlatform.showNotification('Report generated successfully', 'success');
+        
+        // Update charts and tables with new data
+        // Implementation depends on backend API
+    }, 2000);
+}
+
+// Initialize chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTrendsChart();
+    
+    // Set default date range
+    const endDate = new Date().toISOString().split('T')[0];
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - 12);
+    
+    document.getElementById('end-date').value = endDate;
+    document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

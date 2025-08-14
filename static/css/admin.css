@@ -1,0 +1,359 @@
+/* Admin Panel Specific Styles */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.admin-sidebar .sidebar-header {
+    padding: 1rem;
+    background-color: #34495e;
+    border-bottom: 1px solid #3a5169;
+}
+
+.admin-sidebar .sidebar-header h4 {
+    margin: 0;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.admin-sidebar .nav {
+    padding: 1rem 0;
+}
+
+.admin-sidebar .nav-item {
+    margin: 0;
+}
+
+.admin-sidebar .nav-link {
+    color: #bdc3c7;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.admin-sidebar .nav-link i {
+    margin-right: 0.75rem;
+    width: 20px;
+    text-align: center;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+}
+
+.admin-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.admin-header {
+    background: white;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-header h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+}
+
+.admin-header .breadcrumb {
+    margin: 0;
+    background: none;
+    padding: 0;
+}
+
+/* Dashboard Stats */
+.stat-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card.primary .stat-icon {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+
+.stat-card.success .stat-icon {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.stat-card.warning .stat-icon {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.stat-card.danger .stat-icon {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    color: #2c3e50;
+}
+
+.stat-card .stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.stat-card .stat-change {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.stat-card .stat-change.positive {
+    color: #28a745;
+}
+
+.stat-card .stat-change.negative {
+    color: #dc3545;
+}
+
+/* Tables */
+.admin-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-table .table {
+    margin: 0;
+}
+
+.admin-table .table thead th {
+    background-color: #f8f9fa;
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    padding: 1rem;
+}
+
+.admin-table .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.admin-table .table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Action Buttons */
+.action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    margin-right: 0.25rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.verified {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Charts */
+.chart-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 400px;
+}
+
+.chart-container h5 {
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+}
+
+/* Bulk Actions */
+.bulk-actions {
+    background: #e3f2fd;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border-left: 4px solid #2196f3;
+}
+
+.bulk-actions .selected-count {
+    font-weight: bold;
+    color: #1976d2;
+}
+
+/* Search and Filters */
+.admin-search {
+    max-width: 300px;
+}
+
+.filter-section {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filter-section .form-select,
+.filter-section .form-control {
+    border-radius: 4px;
+}
+
+/* Export Controls */
+.export-controls {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.export-controls .btn {
+    margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        margin-left: -250px;
+        transition: margin-left 0.3s ease;
+    }
+    
+    .admin-sidebar.show {
+        margin-left: 0;
+    }
+    
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .admin-table {
+        font-size: 0.9rem;
+    }
+    
+    .admin-table .table thead th,
+    .admin-table .table tbody td {
+        padding: 0.5rem;
+    }
+}
+
+/* Loading States */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Dark Theme Support for Admin */
+[data-theme="dark"] .admin-sidebar {
+    background-color: #1a1a1a;
+    border-right: 1px solid #333;
+}
+
+[data-theme="dark"] .admin-sidebar .sidebar-header {
+    background-color: #2d2d2d;
+    border-bottom-color: #333;
+}
+
+[data-theme="dark"] .admin-content {
+    background-color: #121212;
+}
+
+[data-theme="dark"] .admin-header,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .admin-table,
+[data-theme="dark"] .chart-container,
+[data-theme="dark"] .filter-section,
+[data-theme="dark"] .export-controls {
+    background-color: #2d2d2d;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .admin-table .table thead th {
+    background-color: #3d3d3d;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .admin-table .table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
